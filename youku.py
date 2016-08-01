@@ -430,7 +430,12 @@ def get_zhubo_next_updatetime(new_updatetime):
 	if new_updatetime > current_time:
 		raise Exception('获取的视频更新时间一长，请检查！')
 	# 根据最新的视频更新时间，决定下次的更新时间
-	return abs(current_time - new_updatetime) + current_time
+	# 如果视频时间差大于一周
+	if abs(current_time - new_updatetime) > 14*update_period:
+		return abs(current_time - new_updatetime) + current_time
+	else:
+		return current_time + update_period
+
 	
 
 # 获取优酷主播频道信息

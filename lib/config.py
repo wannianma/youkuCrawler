@@ -37,7 +37,7 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, lik
 CONNECT_TIME = 1
 
 # Youku video
-YOUKU_UPDATE_PERIOD = 3600*24
+YOUKU_UPDATE_PERIOD = 3600*12
 YOUKU_CLIENT_ID = '5af6a7d8274a36e8'
 
 #worker config
