@@ -11,6 +11,8 @@ import re,sys,os
 import json
 import gevent.monkey
 
+# linux定时任务更改当前路径
+os.chdir('/data/crawler/')
 
 gevent.monkey.patch_socket()
 import gevent
@@ -153,8 +155,12 @@ def _convert_publish_time(str):
 				time_str = '{0} {1}:00'.format(time_str, m.group())
 		if re.match(r'\d+-\d+-\d+$', str):
 			time_str = '{0} 00:00:01'.format(str)
-		if re.match(r'\d+-\d+\s\d+:\d+:\d+', str):
+		if re.match(r'\d+-\d+\s\d+:\d+:\d+$', str):
 			time_str = '{0}-{1}'.format(today.year, str)
+		if re.match(r'\d+-\d+\s\d+:\d+$', str):
+			time_str = '{0}-{1}:00'.format(today.year, str)
+		if re.match(r'\d+-\d+-\d+\s\d+:\d+:\d+$', str):
+			time_str = str
 		return _str_to_timestamp(time_str)
 
 # 将视频时长转换为数字形式
@@ -169,7 +175,12 @@ def _convert_video_time(str):
 # 将视频观看数转换为数字形式
 # from 5,343 => 5343
 # from 2.4万 => 24000
+# 特殊情况 1,012万
 def _convert_video_num(str):
+	if str.find(',') > 0 and str.find('万') > 0:
+		pre_num = str[0:str.find('万')]
+		pre_num = int(''.join(str.split(',')))
+		return pre_num * 10000
 	if str.find(',') > 0:
 		return int(''.join(str.split(',')))
 	if str.find('万') > 0:
@@ -178,11 +189,22 @@ def _convert_video_num(str):
 
 # 执行phantomjs获取网页内容
 def get_ajax_html_by_phantomjs(url):
-	cmd = 'phantomjs D:/Code/phantomjs/examples/pro_youku.js "%s"'%url
+	cmd = 'phantomjs phantomjs/examples/pro_youku.js "%s"'%url
 	print 'cmd:', cmd
 	stdout, stderr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 	print 'err:', stderr
 	return stdout
+
+# 检查vid是否已存在，即视频已插入数据库
+# 获取优酷主播频道信息
+def check_vid_from_db(vid):
+	# To_do 添加主播视频最近更新时间
+	fields = ['id']
+	res = db_sy.db_select(dbconn, 'video_data', "`vid` = '{0}' ".format(vid), fields)
+	if res:
+		return True
+	else:
+		return False
 
 # 对组装video和主播信息
 def get_videos_info(zhubo, videos):
@@ -213,9 +235,12 @@ def get_videos_info(zhubo, videos):
 				updatetime = temp_kw['publishtime']
 			temp_kw['mark'] = video['num']
 			temp_kw['vid'] = video['vid']
+			# 查询当前vid是否存在
+			if check_vid_from_db(video['vid']):
+				continue
 			res_arr.append(temp_kw)
 	# 更新主播uid信息和最新视频更新时间
-	zhubo['uid'] = uid
+	# zhubo['uid'] = uid
 	zhubo['v_updatetime'] = updatetime
 	# 更新主播下次视频更新时间
 	zhubo['v_next_updatetime'] = get_zhubo_next_updatetime(updatetime)
@@ -282,8 +307,9 @@ def extract_videos_by_5_col(url,items_list):
 	return v_list
 
 # 优酷列表单页面处理
-def get_single_list(channel_url):
+def get_single_list(channel_url, is_all=False):
 	print 'channel_url : ' + channel_url + '\r\n'
+	logger.info('url:{0}'.format(channel_url))
 	v_list = None
 	# 下一页地址
 	next_page_url = None
@@ -297,18 +323,22 @@ def get_single_list(channel_url):
 		# 判断页面所用模板
 		if not soup.find(class_='yk-col4') is None:
 			items_list = soup.find_all(class_='yk-col4')
-			v_list = extract_videos_by_4_col(channel_url, items_list)
+			v_list = extract_videos_by_4_col(channel_url, items_list, is_all)
 		else:
 			items_list = soup.find_all(class_='v va')
 			v_list = extract_videos_by_5_col(channel_url, items_list)
 	# 对v_list数据进行组装
 	for video in v_list:
-		video['vid'] = _extract_vid_from_url(video['link'])
-		video['time'] = _convert_video_time(video['time'])
-		video['publish_time'] = _convert_publish_time(video['publish_time'])
-		video['num'] = _convert_video_num(video['num'])
-		# TODO 提取视频标题中关键词
-		video['keyword'] = ''
+		try:
+			video['vid'] = _extract_vid_from_url(video['link'])
+			video['time'] = _convert_video_time(video['time'])
+			video['publish_time'] = _convert_publish_time(video['publish_time'])
+			video['num'] = _convert_video_num(video['num'])
+			# TODO 提取视频标题中关键词
+			video['keyword'] = ''
+		except Exception,e:
+			logger.error(e)
+			continue
 	return v_list, next_page_url
 
 # 通过Youku API调取列表信息
@@ -337,7 +367,7 @@ def get_all_list(channel_url):
 	# 加入限制条件,只爬取前250页数据
 	while not next_page_url is None and start_page < 250:
 		v_list = []
-		v_list, next_page_url = get_single_list(next_page_url)
+		v_list, next_page_url = get_single_list(next_page_url, is_all=True)
 		if v_list is None:
 			continue
 		v_all_list.extend(v_list)
@@ -353,19 +383,19 @@ def pro_video_list(zhubo):
 	if is_init:
 		res_list = get_all_list(channel_url)
 		# 过滤操作
-		print "#####IN Videos Filter#####\r\n"
+		print "#####IN Videos Filter,size:{0}#####\r\n".format(len(res_list))
 		zhubo, videos = get_videos_info(zhubo, res_list)
-		print "#####End Videos Filter\r\n"
+		print "#####End Videos Filter,size:{0}#####\r\n".format(len(videos))
 		# 获取主播视频数量
 		zhubo['v_num'] = len(videos)
 		# 入库
 		# 更新video表数据
-		#db_sy.db_insert(dbconn, videos, 'video')
+		db_sy.db_insert(dbconn, videos, 'video')
 		# 更新anchor表数据
 		# 组装主播数据
-		#zhubo_list = []
-		#zhubo_list.append(zhubo)
-		#db_sy.db_update(dbconn, zhubo_list, 'anchor')
+		zhubo_list = []
+		zhubo_list.append(zhubo)
+		db_sy.db_update(dbconn, zhubo_list, 'anchor')
 	else:
 		next_updatetime = zhubo['v_next_updatetime']
 		# 判断当前主播是否更新
@@ -379,12 +409,12 @@ def pro_video_list(zhubo):
 			# 更新主播视频数量
 			zhubo['v_num'] = zhubo['v_num'] + len(videos)
 			# 入库
-			# 更新anchor表数据,更新v_num,v_updatetime
-			db_sy.db_insert(dbconn, videos, 'video')
 			# 更新video表数据
-			zhubo_list = []
-			zhubo_list.append(zhubo)
-			db_sy.db_update(dbconn, zhubo_list, 'anchor')
+			db_sy.db_insert(dbconn, videos, 'video')
+		# 更新anchor表数据,更新v_num,v_updatetime
+		zhubo_list = []
+		zhubo_list.append(zhubo)
+		db_sy.db_update(dbconn, zhubo_list, 'anchor')
 	print zhubo['id'] + ', size: ' + str(len(videos)) + '\r\n'
 
 # 判断主播当前时间是否进行更新操作
@@ -409,7 +439,7 @@ def get_zhubo_from_db():
 	is_init = False
 	# To_do 添加主播视频最近更新时间
 	fields = ['id', 'title', 'game_type', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id']
-	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`thumb` like '%anchor%' ", fields, 50)
+	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != '' ", fields)
 	for zhubo in res_zhubo:
 		info = {}
 		info['id'] = str(zhubo[0])
@@ -438,4 +468,5 @@ if __name__ == "__main__":
 	print "time cost : " + str(int((time.time() - now))) + " seconds"
 	# 关闭数据库连接
 	dbconn.close()
-	# 将最新视频更新时间更新到对应主播记录中
+	# t = '2016-07-02 22:19:19'
+	# print str(_convert_publish_time(t))
