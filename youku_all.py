@@ -434,12 +434,13 @@ def get_zhubo_next_updatetime(new_updatetime):
 	
 
 # 获取优酷主播频道信息
-def get_zhubo_from_db():
+def get_zhubo_from_db(ids):
 	res = []
 	is_init = True
+	str_ids = ','.join(ids)
 	# To_do 添加主播视频最近更新时间
 	fields = ['id', 'title', 'game_type', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id']
-	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`id` in (2147) ", fields)
+	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`id` in ({0}) ".format(str_ids), fields)
 	for zhubo in res_zhubo:
 		info = {}
 		info['id'] = str(zhubo[0])
@@ -456,9 +457,14 @@ def get_zhubo_from_db():
 
 
 if __name__ == "__main__":
+	# 读取命令行主播信息
+	if len(sys.argv) < 2:
+		print "请提供带爬取主播id"
+		return;
+	zhubo_ids = sy.argv[1:]
 	# 读取主播自频道信息
 	#zipindao_info = [{'name':u'粉鱼pink__fish', 'url':'http://i.youku.com/u/UMTI4Nzg5OTUwNA==/videos', 'is_init':True}]
-	zipindao_info = get_zhubo_from_db()
+	zipindao_info = get_zhubo_from_db(zhubo_ids)
 
 	now =  time.time()
 
