@@ -7,6 +7,8 @@ var page = require('webpage').create(),
 
 //page.viewportSize = {width: 4800,height: 8000};
 page.settings.loadImages = false;
+page.settings.userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36';
+page.settings.resourceTimeout = 2000;
 page.onConsoleMessage = function(msg) {
     console.log(msg);
 };
