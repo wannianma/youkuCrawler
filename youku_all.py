@@ -460,8 +460,9 @@ if __name__ == "__main__":
 	# 读取命令行主播信息
 	if len(sys.argv) < 2:
 		print "请提供带爬取主播id"
-		return;
-	zhubo_ids = sy.argv[1:]
+		sys.exit(0)
+
+	zhubo_ids = sys.argv[1:]
 	# 读取主播自频道信息
 	#zipindao_info = [{'name':u'粉鱼pink__fish', 'url':'http://i.youku.com/u/UMTI4Nzg5OTUwNA==/videos', 'is_init':True}]
 	zipindao_info = get_zhubo_from_db(zhubo_ids)
