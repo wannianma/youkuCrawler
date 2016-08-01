@@ -82,7 +82,7 @@ def _update_onlive_data(cursor, kw, is_get_livedata = True):
 
 def _update_anchor_data(cursor, kw):
     try:
-        cursor.execute("UPDATE " +config.DB_TABLE_ANCHOR+ " SET `platform_id` = %s, `v_updatetime` = %s, `v_num` = %s, `v_next_updatetime`=%s WHERE `id` = %s", (kw['uid'], kw['v_updatetime'], kw['v_num'], kw['v_next_updatetime'],kw['id']))
+        cursor.execute("UPDATE " +config.DB_TABLE_ANCHOR+ " SET `v_updatetime` = %s, `v_num` = %s, `v_next_updatetime`=%s WHERE `id` = %s", (kw['v_updatetime'], kw['v_num'], kw['v_next_updatetime'],kw['id']))
     except Exception as e:
         logger.error("%s | %s" % ("DB anchor Update Error", e))
         raise
@@ -102,7 +102,7 @@ def _insert_video_data(cursor,kw):
         #####
         inputtime = str(int(time.time()))
         #将爬取到的视频，存入其他(14)分类，并设置状态为1级审核
-        cursor.execute("INSERT INTO " +config.DB_TABLE_VIDEO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`,`vision`,`video_category`,`anchor`) VALUES (%s, '0', %s, '', %s, %s, %s, '0', '', '0', '1', '1', '0', 'admin', %s, %s,'1','1',%s)",(kw['catid'], kw['title'], kw['thumb'], kw['keywords'], kw['keywords'], kw['publishtime'], 0,kw['anchor']))
+        cursor.execute("INSERT INTO " +config.DB_TABLE_VIDEO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`,`vision`,`video_category`,`anchor`) VALUES (%s, '0', %s, '', %s, %s, %s, '0', '', '0', '99', '1', '0', 'admin', %s, %s,'1','1',%s)",(kw['catid'], kw['title'], kw['thumb'], kw['keywords'], kw['keywords'], kw['publishtime'], 0,kw['anchor']))
         insert_id = cursor.lastrowid
         # 更新搜索表
         seg_data = "{0} {1}".format(kw['title'], kw['keywords'].replace(',', ' '))
@@ -113,7 +113,7 @@ def _insert_video_data(cursor,kw):
         cursor.execute("INSERT INTO "+config.DB_TABLE_VIDEO_DATA+" (`id`, `content`, `readpoint`, `groupids_view`, `paginationtype`, `maxcharperpage`, `template`, `paytype`, `allow_comment`, `relation`, `video`, `from`, `vid`, `videoTime`) VALUES (%s, %s, 0, '', 0, 10000, '', 0, '1', %s, '1', 'youku', %s, %s)", (str(insert_id), kw['description'] ,kw['mark'], kw['vid'], kw['v_time']))
         # #将vid与from写入vdata目录的json中
         dir_name = str(insert_id % 100)
-        path = "vdata/"+dir_name
+        path = "/data/wwwroot/ShenYou/vdata/"+dir_name
         if(os.path.exists(path)!=True):
             os.mkdir(path)
         json_str = '{"from":"youku","vid":"%s"}' % kw['vid']
@@ -124,8 +124,6 @@ def _insert_video_data(cursor,kw):
     except Exception as e:
         logger.error("%s | %s" % ('DB Insert Error', e))
         raise
-
-
 
 
 def _insert_toutiao_data(cursor, kw):

@@ -11,14 +11,13 @@ EMAIL_PORT = 25
 
 #logger config
 LOG_NAME = 'video_youku'
-BASIC_LOG_PATH = './log/'
+BASIC_LOG_PATH = '/data/crawler/log/'
 LOG_FILENAME = 'video_youku_crawler.log'
 
 #mysql config
-DB_NAME = 'shenyou'
-DB_HOST = '127.0.0.1'
-DB_USER = 'root'
-DB_PASSWD = 'Manager'
+DB_HOST = ''
+DB_USER = ''
+DB_PASSWD = ''
 DB_CHARSET = 'utf8'
 DB_NAME = 'shenyou'
 DB_TABLE = 'sy_zhibo'
