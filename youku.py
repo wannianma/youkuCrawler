@@ -189,7 +189,7 @@ def _convert_video_num(str):
 
 # 执行phantomjs获取网页内容
 def get_ajax_html_by_phantomjs(url):
-	cmd = 'phantomjs phantomjs/examples/pro_youku.js "%s"'%url
+	cmd = 'phantomjs phantomjs/pro_youku.js "%s"'%url
 	print 'cmd:', cmd
 	stdout, stderr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 	print 'err:', stderr
