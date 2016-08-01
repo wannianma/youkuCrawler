@@ -445,7 +445,7 @@ def get_zhubo_from_db():
 		info['id'] = str(zhubo[0])
 		info['name'] = zhubo[1]
 		info['game_type'] = game_type[zhubo[2]]
-		info['url'] = zhubo[3]
+		info['url'] = zhubo[3].strip()
 		info['v_updatetime'] = zhubo[4]
 		info['v_next_updatetime'] = zhubo[5]
 		info['v_num'] = zhubo[6]
