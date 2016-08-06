@@ -110,7 +110,7 @@ def _insert_video_data(cursor,kw):
         #更新hits表
         cursor.execute("INSERT INTO sy_hits (`hitsid`, `catid`) VALUES ('c-11-%s', %s)",(insert_id, kw['catid']))
         #将vid写入data附表
-        cursor.execute("INSERT INTO "+config.DB_TABLE_VIDEO_DATA+" (`id`, `content`, `readpoint`, `groupids_view`, `paginationtype`, `maxcharperpage`, `template`, `paytype`, `allow_comment`, `relation`, `video`, `from`, `vid`, `videoTime`) VALUES (%s, %s, 0, '', 0, 10000, '', 0, '1', %s, '1', 'youku', %s, %s)", (str(insert_id), kw['description'] ,kw['mark'], kw['vid'], kw['v_time']))
+        cursor.execute("INSERT INTO "+config.DB_TABLE_VIDEO_DATA+" (`id`, `content`, `readpoint`, `groupids_view`, `paginationtype`, `maxcharperpage`, `template`, `paytype`, `allow_comment`, `relation`, `video`, `from`, `vid`, `videoTime`) VALUES (%s, %s, 0, '', 0, 10000, '', 0, '1', %s, '1', %s, %s, %s)", (str(insert_id), kw['description'] ,kw['mark'], kw['platform'], kw['vid'], kw['v_time']))
         # #将vid与from写入vdata目录的json中
         dir_name = str(insert_id % 100)
         path = "/data/wwwroot/ShenYou/vdata/"+dir_name
@@ -121,40 +121,6 @@ def _insert_video_data(cursor,kw):
         f.write(str(json_str))
         f.close()
 
-    except Exception as e:
-        logger.error("%s | %s" % ('DB Insert Error', e))
-        raise
-
-
-def _insert_toutiao_data(cursor, kw):
-    try:
-        inputtime = str(int(time.time()))
-        print "title:" + kw['title']
-        title = kw['title']
-        #判断catid是否等于34(其他)----如果等于34则根据标题判断文章所属分类
-        if kw['catid']==34:
-            if title.find('lol')>=0:
-                cursor.execute("INSERT INTO " +config.DB_TABLE_TOUTIAO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`) VALUES ('28', '0', %s, '', %s, '', '', '0', '', '0', '99', '1', '0', 'admin', %s, %s)",(kw['title'], kw['pic'], inputtime, inputtime))
-            elif title.find('dota')>=0:
-                cursor.execute("INSERT INTO " +config.DB_TABLE_TOUTIAO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`) VALUES ('30', '0', %s, '', %s, '', '', '0', '', '0', '99', '1', '0', 'admin', %s, %s)",(kw['title'], kw['pic'], inputtime, inputtime))
-            #当标题含有‘星际’关键字
-            elif title.find('\u661f\u9645')>=0:
-                cursor.execute("INSERT INTO " +config.DB_TABLE_TOUTIAO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`) VALUES ('35', '0', %s, '', %s, '', '', '0', '', '0', '99', '1', '0', 'admin', %s, %s)",(kw['title'], kw['pic'], inputtime, inputtime))
-            #当标题含有‘炉石’关键字
-            elif title.find('\u7089\u77f3'):
-                cursor.execute("INSERT INTO " +config.DB_TABLE_TOUTIAO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`) VALUES ('36', '0', %s, '', %s, '', '', '0', '', '0', '99', '1', '0', 'admin', %s, %s)",(kw['title'], kw['pic'], inputtime, inputtime))
-        else:
-            cursor.execute("INSERT INTO " +config.DB_TABLE_TOUTIAO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`) VALUES (%s, '0', %s, '', %s, '', '', '0', '', '0', '99', '1', '0', 'admin', %s, %s)",(kw['catid'],kw['title'], kw['pic'], inputtime, inputtime))
-
-        insert_id = cursor.lastrowid
-        # 更新url
-        url = "http://www.shenyou.tv/index.php?m=content&c=index&a=show&catid="+kw['catid']+"&id=" + str(insert_id)
-        #更新hits表
-        cursor.execute("INSERT INTO sy_hits (`hitsid`, `catid`) VALUES ('c-1-%s', %s)",(insert_id,kw['catid']))
-        cursor.execute("UPDATE "+config.DB_TABLE_TOUTIAO+" SET `url` = %s WHERE `id` = %s", (url, str(insert_id)))
-        # 将content插入到data附表
-        cursor.execute("INSERT INTO "+config.DB_TABLE_TOUTIAO_DATA+" (`id`, `content`, `readpoint`, `groupids_view`, `paginationtype`, `maxcharperpage`, `template`, `paytype`, `relation`, `voteid`, `allow_comment`, `copyfrom`, `from`) VALUES (%s, %s, 0, '', 0, 10000, '', 0, '', 0, 1, '|0', %s)", (str(insert_id), kw['content'], kw['n_from']))
-        print "insert_id :" + str(insert_id)
     except Exception as e:
         logger.error("%s | %s" % ('DB Insert Error', e))
         raise
