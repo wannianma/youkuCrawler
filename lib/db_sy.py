@@ -116,7 +116,7 @@ def _insert_video_data(cursor,kw):
         path = "/data/wwwroot/ShenYou/vdata/"+dir_name
         if(os.path.exists(path)!=True):
             os.mkdir(path)
-        json_str = '{"from":"youku","vid":"%s"}' % kw['vid']
+        json_str = '{"from":"youku","vid":"{0}"}'.format(kw['vid'])
         f=file(path+"/"+str(insert_id)+".json","w+")
         f.write(str(json_str))
         f.close()
