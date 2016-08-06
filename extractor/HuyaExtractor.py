@@ -72,7 +72,7 @@ class HuyaExtractor(BaseExtractor):
         res = None
         if not url or url == '':
             return res
-        matchObj = re.search(r'\/(\d+)\.html', url)
+        matchObj = re.search(r'\/([0-9\-]+)\.html', url)
         if matchObj:
             res = matchObj.group(1)
         return res
