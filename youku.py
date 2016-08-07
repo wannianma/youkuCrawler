@@ -118,6 +118,8 @@ def pro_video_list(zhubo, obj_extractor):
 		next_updatetime = zhubo['v_next_updatetime']
 		# 判断当前主播是否更新
 		if (next_updatetime == 0 or is_update_zhubo(next_updatetime)):
+			# 间隔0.3秒
+			time.sleep(0.3)
 			res_list, url = obj_extractor.get_single_list(channel_url)
 		# 过滤操作
 		print "#####IN Videos Filter,size:{0}#####\r\n".format(len(res_list))
@@ -161,7 +163,7 @@ def get_zhubo_from_db():
 	is_init = False
 	# To_do 添加主播视频最近更新时间
 	fields = ['id', 'title', 'game_type', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id', 'platform']
-	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != '' and platform = 'huya' ", fields)
+	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != '' ", fields)
 	for zhubo in res_zhubo:
 		info = {}
 		info['id'] = str(zhubo[0])
