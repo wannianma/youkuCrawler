@@ -1,2 +1,2 @@
 
-__all__ = ['HuyaExtractor', 'YoukuExtractor']
+__all__ = ['HuyaExtractor', 'YoukuExtractor', 'QqExtractor']

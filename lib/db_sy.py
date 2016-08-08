@@ -113,7 +113,10 @@ def _insert_video_data(cursor,kw):
         cursor.execute("INSERT INTO "+config.DB_TABLE_VIDEO_DATA+" (`id`, `content`, `readpoint`, `groupids_view`, `paginationtype`, `maxcharperpage`, `template`, `paytype`, `allow_comment`, `relation`, `video`, `from`, `vid`, `videoTime`) VALUES (%s, %s, 0, '', 0, 10000, '', 0, '1', %s, '1', %s, %s, %s)", (str(insert_id), kw['description'] ,kw['mark'], kw['platform'], kw['vid'], kw['v_time']))
         # #将vid与from写入vdata目录的json中
         dir_name = str(insert_id % 100)
-        path = "/data/wwwroot/ShenYou/vdata/"+dir_name
+        if config.ENV_OS == 'linux':
+            path = "/data/wwwroot/ShenYou/vdata/"+dir_name
+        else:
+            path = 'vdata/' + dir_name
         if(os.path.exists(path)!=True):
             os.mkdir(path)
         json_str = '{"from":"%s","vid":"%s"}' % (kw['platform'],kw['vid'])

@@ -11,7 +11,8 @@ from pprint import pprint
 from extractor import *
 
 # linux定时任务更改当前路径
-os.chdir('/data/crawler/')
+if config.ENV_OS == 'linux':
+	os.chdir('/data/crawler/')
 
 # 全局数据库连接
 dbconn = db_sy.getConnection()

@@ -1,17 +1,14 @@
 #-*-coding:utf-8-*-
 #!/usr/bin/python
 
-from lib import config, req_sy, db_sy, encoding
-from lib import email_sy as email
-from lib.logger import logger
-import time,datetime
-import re,sys,os
-import json
-from pprint import pprint
+from lib import config, db_sy
+import time
+import sys,os
 from extractor import *
 
 # linux定时任务更改当前路径
-os.chdir('/data/crawler/')
+if config.ENV_OS == 'linux':
+	os.chdir('/data/crawler/')
 
 # 全局数据库连接
 dbconn = db_sy.getConnection()
