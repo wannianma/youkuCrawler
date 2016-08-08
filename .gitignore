@@ -93,3 +93,4 @@ src/
 
 # IDE
 .idea/
+.idea/*
