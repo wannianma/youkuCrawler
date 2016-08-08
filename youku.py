@@ -119,7 +119,7 @@ def pro_video_list(zhubo, obj_extractor):
 		# 判断当前主播是否更新
 		if (next_updatetime == 0 or is_update_zhubo(next_updatetime)):
 			# 间隔0.3秒
-			time.sleep(0.3)
+			time.sleep(0.5)
 			res_list, url = obj_extractor.get_single_list(channel_url)
 		# 过滤操作
 		print "#####IN Videos Filter,size:{0}#####\r\n".format(len(res_list))
