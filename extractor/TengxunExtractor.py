@@ -4,9 +4,9 @@ from bs4 import BeautifulSoup
 from BaseExtractor import BaseExtractor
 import re,json
 
-class QqExtractor(BaseExtractor):
+class TengxunExtractor(BaseExtractor):
     def __init__(self, zhubo):
-        super(QqExtractor, self).__init__(zhubo)
+        super(TengxunExtractor, self).__init__(zhubo)
         # orderflag=0 最新排序
         # orderflag=1 最热排序
         self.list_api = 'http://c.v.qq.com/vchannelinfo?otype=json&uin={vuin}&qm=1&pagenum={page_num}&num=24&sorttype=0&orderflag=0&low_login=1'
@@ -82,5 +82,5 @@ class QqExtractor(BaseExtractor):
 if __name__ == '__main__':
     zhubo = [{'url':'http://v.qq.com/vplus/qiangpao/videos'},{'url':'http://v.qq.com/vplus/caomei/videos'}]
     for zb in zhubo:
-        qq = QqExtractor(zb)
+        qq = TengxunExtractor(zb)
         arr = qq.get_single_list(zb['url'])
