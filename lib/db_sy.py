@@ -104,6 +104,9 @@ def _insert_video_data(cursor,kw):
         #将爬取到的视频，存入其他(14)分类，并设置状态为1级审核
         cursor.execute("INSERT INTO " +config.DB_TABLE_VIDEO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`,`vision`,`video_category`,`anchor`) VALUES (%s, '0', %s, '', %s, %s, %s, '0', '', '0', '99', '1', '0', 'admin', %s, %s,'1','1',%s)",(kw['catid'], kw['title'], kw['thumb'], kw['keywords'], kw['keywords'], kw['publishtime'], 0,kw['anchor']))
         insert_id = cursor.lastrowid
+        # 更新 video表url字段
+        v_url = 'http://www.shenyou.tv/video/{0}.html'.format(insert_id)
+        cursor.execute("UPDATE " +config.DB_TABLE_VIDEO+" SET `url`= %s WHERE `id` = %s", (v_url, insert_id))
         # 更新搜索表
         seg_data = "{0} {1}".format(kw['title'], kw['keywords'].replace(',', ' '))
         cursor.execute("INSERT INTO sy_search (`typeid`, `id`, `adddate`, `data`, `siteid`) VALUES (57, %s, %s, %s, 1)", (insert_id, int(time.time()), seg_data))
