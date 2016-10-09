@@ -102,7 +102,7 @@ def _insert_video_data(cursor,kw):
         #####
         inputtime = str(int(time.time()))
         #将爬取到的视频，存入其他(14)分类，并设置状态为1级审核
-        cursor.execute("INSERT INTO " +config.DB_TABLE_VIDEO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`,`vision`,`video_category`,`anchor`) VALUES (%s, '0', %s, '', %s, %s, %s, '0', '', '0', '1', '1', '0', 'admin', %s, %s,'1','1',%s)",(kw['catid'], kw['title'], kw['thumb'], kw['keywords'], kw['keywords'], kw['publishtime'], kw['publishtime'],kw['anchor']))
+        cursor.execute("INSERT INTO " +config.DB_TABLE_VIDEO+" (`catid`, `typeid`, `title`, `style`, `thumb`, `keywords`, `description`, `posids`, `url`, `listorder`, `status`, `sysadd`, `islink`, `username`, `inputtime`, `updatetime`,`vision`,`video_category`,`anchor`) VALUES (%s, '0', %s, '', %s, %s, %s, '0', '', '0', '1', '1', '0', 'spider', %s, %s,'1','1',%s)",(kw['catid'], kw['title'], kw['thumb'], kw['keywords'], kw['keywords'], kw['publishtime'], kw['publishtime'],kw['anchor']))
         insert_id = cursor.lastrowid
         # 更新 video表url字段
         v_url = 'http://www.shenyou.tv/video/{0}.html'.format(insert_id)

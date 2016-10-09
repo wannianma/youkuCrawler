@@ -95,7 +95,7 @@ class YoukuExtractor(BaseExtractor):
             if not next_page is None and not next_page.a is None:
                 next_page_url = self.host_url + next_page.a['href']
             # 判断页面所用模板
-            if not soup.find(class_='yk-col4') is None:
+            if not soup.find(class_='yk-col4 new') is None:
                 items_list = soup.find_all(class_='yk-col4')
                 v_list = self._extract_videos_by_4_col(channel_url, items_list, is_all)
             else:
