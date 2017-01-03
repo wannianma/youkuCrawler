@@ -24,7 +24,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 # 游戏类别对应的PHPCMS中的catid
-game_type = {'lol':'6','Dota2':'7','dota2':'7','starcraft':'8','wow':'13','cf':'20','diablo':'21','hearthstone':'22','minecraft':'60','overwatch':'61','pvp':'62','WorldOfTanks':'63','CS_GO':'64','cos':'65','dota':'66','warcraft':'67','zhanzheng':'68','sheji':'69','CR':'70','yuanchuang':'71','zixun':'72','other':'14'}
+# game_type = {'lol':'6','Dota2':'7','dota2':'7','starcraft':'8','wow':'13','cf':'20','diablo':'21','hearthstone':'22','minecraft':'60','overwatch':'61','pvp':'62','WorldOfTanks':'63','CS_GO':'64','cos':'65','dota':'66','warcraft':'67','zhanzheng':'68','sheji':'69','CR':'70','yuanchuang':'71','zixun':'72','other':'14'}
 
 # 检查vid是否已存在，即视频已插入数据库
 # 获取优酷主播频道信息
@@ -43,7 +43,7 @@ def get_videos_info(zhubo, videos):
 	vids = []
 	res_arr = []
 	anchor_id = zhubo['id']
-	catid = zhubo['game_type']
+	catid = zhubo['v_category']
 	# 视频的上次更新时间
 	old_updatetime = zhubo['v_updatetime']
 	updatetime = zhubo['v_updatetime']
@@ -162,13 +162,13 @@ def get_zhubo_from_db(ids):
 	is_init = True
 	str_ids = ','.join(ids)
 	# To_do 添加主播视频最近更新时间
-	fields = ['id', 'title', 'game_type', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id', 'platform']
+	fields = ['id', 'title', 'video_category', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id', 'platform']
 	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`id` in ({0}) ".format(str_ids), fields)
 	for zhubo in res_zhubo:
 		info = {}
 		info['id'] = str(zhubo[0])
 		info['name'] = zhubo[1]
-		info['game_type'] = game_type[zhubo[2]]
+		info['v_category'] = zhubo[2]
 		info['url'] = zhubo[3].strip()
 		info['v_updatetime'] = zhubo[4]
 		info['v_next_updatetime'] = zhubo[5]

@@ -2,6 +2,7 @@
 #!/usr/bin/python
 
 from lib import config, db_sy
+from pprint import pprint
 import time
 import sys,os
 from extractor import *
@@ -20,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 # 游戏类别对应的PHPCMS中的catid
-game_type = {'lol':'6','Dota2':'7','dota2':'7','starcraft':'8','wow':'13','cf':'20','diablo':'21','hearthstone':'22','minecraft':'60','overwatch':'61','pvp':'62','WorldOfTanks':'63','CS_GO':'64','cos':'65','dota':'66','warcraft':'67','zhanzheng':'68','sheji':'69','CR':'70','yuanchuang':'71','zixun':'72','other':'14'}
+# game_type = {'lol':'6','Dota2':'7','dota2':'7','starcraft':'8','wow':'13','cf':'20','duanyou':'95','hearthstone':'22','minecraft':'60','overwatch':'61','pvp':'62','WorldOfTanks':'63','CS_GO':'64','cos':'65','dota':'66','warcraft':'67','zhanzheng':'68','sheji':'69','CR':'70','yuanchuang':'71','zixun':'72','zhuji':'94','huaijiu':'99','other':'14'}
 
 # 检查vid是否已存在，即视频已插入数据库
 # 获取优酷主播频道信息
@@ -39,7 +40,7 @@ def get_videos_info(zhubo, videos):
 	vids = []
 	res_arr = []
 	anchor_id = zhubo['id']
-	catid = zhubo['game_type']
+	catid = zhubo['v_category']
 	# 视频的上次更新时间
 	old_updatetime = zhubo['v_updatetime']
 	updatetime = zhubo['v_updatetime']
@@ -139,13 +140,14 @@ def pro_video_list(zhubo, obj_extractor):
 # 更新单位 24h, 12h, 6h, 1h
 def is_update_zhubo(next_updatetime):
 	current_time = int(time.time())
-	return True if abs(current_time - next_updatetime) < update_period else False;
+	return True if abs(current_time - next_updatetime) < update_period else False
 
 # 获取主播下次更新时间
 def get_zhubo_next_updatetime(new_updatetime):
 	current_time = int(time.time())
+	pprint(new_updatetime)
 	if new_updatetime > current_time:
-		raise Exception('获取的视频更新时间一长，请检查！')
+		raise Exception('获取的视频更新时间一长，[请检查！')
 	# 根据最新的视频更新时间，决定下次的更新时间
 	# 如果视频时间差大于一周
 	if abs(current_time - new_updatetime) > 14*update_period:
@@ -159,13 +161,13 @@ def get_zhubo_from_db():
 	res = []
 	is_init = False
 	# To_do 添加主播视频最近更新时间
-	fields = ['id', 'title', 'game_type', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id', 'platform']
-	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != '' ", fields)
+	fields = ['id', 'title','video_category', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id', 'platform']
+	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != '' and id = 1335", fields)
 	for zhubo in res_zhubo:
 		info = {}
 		info['id'] = str(zhubo[0])
 		info['name'] = zhubo[1]
-		info['game_type'] = game_type[zhubo[2]]
+		info['v_category'] = zhubo[2]
 		info['url'] = zhubo[3].strip()
 		info['v_updatetime'] = zhubo[4]
 		info['v_next_updatetime'] = zhubo[5]
