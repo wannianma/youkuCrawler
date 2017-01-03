@@ -120,7 +120,7 @@ def pro_video_list(zhubo, obj_extractor):
 			time.sleep(0.5)
 			res_list, url = obj_extractor.get_single_list(channel_url)
 		# 过滤操作
-		print "#####IN Videos Filter,size:{0}#####\r\n".format(len(res_list))
+		print "#####IN Videos Filter size:{0}#####\r\n".format(len(res_list))
 		zhubo, videos = get_videos_info(zhubo, res_list)
 		print "#####End Videos Filter,size:{0}#####\r\n".format(len(videos))
 		if len(videos) != 0:
@@ -162,7 +162,7 @@ def get_zhubo_from_db():
 	is_init = False
 	# To_do 添加主播视频最近更新时间
 	fields = ['id', 'title','video_category', 'platform_url', 'v_updatetime', 'v_next_updatetime', 'v_num', 'platform_id', 'platform']
-	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != '' and id = 1335", fields)
+	res_zhubo = db_sy.db_select(dbconn, 'anchor', "`platform_url` != ''", fields)
 	for zhubo in res_zhubo:
 		info = {}
 		info['id'] = str(zhubo[0])
