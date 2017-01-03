@@ -84,10 +84,14 @@ class BaseExtractor(object):
                     time_str = '{0} {1}:00'.format(time_str, m.group())
             if re.match(r'\d+-\d+-\d+$', str):
                 time_str = '{0} 00:00:01'.format(str)
-            if re.match(r'\d+-\d+\s\d+:\d+:\d+$', str):
-                time_str = '{0}-{1}'.format(today.year, str)
-            if re.match(r'\d+-\d+\s\d+:\d+$', str):
-                time_str = '{0}-{1}:00'.format(today.year, str)
+            match_obj = re.match(r'(\d+)-\d+\s\d+:\d+:\d+$', str)
+            if match_obj:
+	        t_month = int(match_obj.group(1))
+                time_str = '{0}-{1}'.format(t_month > today.month and today.year-1 or today.year, str)
+            match_obj = re.match(r'(\d+)-\d+\s\d+:\d+$', str)
+            if match_obj:
+		t_month = int(match_obj.group(1))
+                time_str = '{0}-{1}:00'.format(t_month>today.month and today.year-1 or today.year, str)
             if re.match(r'\d+-\d+-\d+\s\d+:\d+:\d+$', str):
                 time_str = str
             return self._str_to_timestamp(time_str)
