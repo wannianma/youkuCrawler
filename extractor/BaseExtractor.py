@@ -55,7 +55,6 @@ class BaseExtractor(object):
     # 将视频发布时间进行转换为Unix时间戳
     # 1分钟前,1小时前,昨天 14.26,前天 18:13,
     def _convert_publish_time(self, str):
-	print("before " + str)
         # 当前时间
         current_time = int(time.time())
         today = datetime.date.today()
@@ -96,7 +95,6 @@ class BaseExtractor(object):
                 time_str = '{0}-{1}:00'.format(today.year-1 if (t_month>today.month) or (t_month == today.month and t_day >= today.day) else today.year, str)
             if re.match(r'\d+-\d+-\d+\s\d+:\d+:\d+$', str):
                 time_str = str
-	    print("after " + time_str)
             return self._str_to_timestamp(time_str)
 
     # 将视频时长转换为数字形式
