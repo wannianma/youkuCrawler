@@ -23,7 +23,7 @@ class HuyaExtractor(BaseExtractor):
                 next_page_url = next_page.a['href']
             # 判断页面所用模板
             if not soup.find(class_='video-list fltL') is None:
-                items_list = soup.find_all(class_='video-list fltL')
+                items_list = soup.find(class_='video-list fltL').find_all('li')
                 v_list = self._extract_videos_by_4_col(items_list)
         	# 对v_list数据进行组装
         	for video in v_list:
