@@ -17,26 +17,26 @@ class HuyaExtractor(BaseExtractor):
         html = self.get_html(channel_url)
         if html.strip() != '':
             soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
-            # 获取下一页地址
+	    # 获取下一页地址
             next_page = soup.find(class_='uiPaging-next')
             if not next_page is None and not next_page.a is None:
                 next_page_url = next_page.a['href']
             # 判断页面所用模板
-            if not soup.find(class_='video-sm-cont fltL') is None:
-                items_list = soup.find_all(class_='video-sm-cont fltL')
+            if not soup.find(class_='video-list fltL') is None:
+                items_list = soup.find_all(class_='video-list fltL')
                 v_list = self._extract_videos_by_4_col(items_list)
-        # 对v_list数据进行组装
-        for video in v_list:
-            try:
-                video['vid'] = self._extract_vid_from_url(video['link'])
-                video['time'] = self._convert_video_time(video['time'])
-                video['publish_time'] = self._convert_publish_time(video['publish_time'])
-                video['num'] = self._convert_video_num(video['num'])
-                # TODO 提取视频标题中关键词
-                video['keyword'] = ''
-            except Exception, e:
-                self._logger.error(e)
-                continue
+        	# 对v_list数据进行组装
+        	for video in v_list:
+            	    try:
+                	video['vid'] = self._extract_vid_from_url(video['link'])
+                	video['time'] = self._convert_video_time(video['time'])
+                	video['publish_time'] = self._convert_publish_time(video['publish_time'])
+                	video['num'] = self._convert_video_num(video['num'])
+                	# TODO 提取视频标题中关键词
+                	video['keyword'] = ''
+            	    except Exception, e:
+                	self._logger.error(e)
+                	continue
         return v_list, next_page_url
 
     def _extract_videos_by_4_col(self, items_list):
@@ -52,11 +52,11 @@ class HuyaExtractor(BaseExtractor):
                 # 提取视频封面
                 info['avatar'] = v_link.img['src']
                 # 提取视频时长
-                info['time'] = item.find(class_='video-info-time').string.strip()
+                info['time'] = item.find(class_='video-duration').string.strip()
                 # 提取视频发布时间
-                info['publish_time'] = item.find(class_='video-date fltR').string.strip()
+                info['publish_time'] = item.find(class_='fltR').string.strip()
                 # 提取视频观看量
-                info['num'] = item.find(class_='video-meta-playtotal fltL').text.strip()
+                info['num'] = item.find(class_='video-meta-pnum').text.strip()
                 self._logger.info('{0}:{1}'.format(info['publish_time'], self._convert_publish_time(info['publish_time'])))
             except Exception, e:
                 # 去除class为yk-col4但不包含视频信息的节点
