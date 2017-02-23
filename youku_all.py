@@ -141,7 +141,9 @@ def pro_video_list(zhubo, obj_extractor):
 # 更新单位 24h, 12h, 6h, 1h
 def is_update_zhubo(next_updatetime):
 	current_time = int(time.time())
-	return True if abs(current_time - next_updatetime) < update_period else False;
+	# return True if abs(current_time - next_updatetime) < update_period else False;
+        # 暂时取消判断主播是否更新的机制，提升爬取的实时性
+        return True
 
 # 获取主播下次更新时间
 def get_zhubo_next_updatetime(new_updatetime):
