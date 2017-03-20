@@ -92,6 +92,7 @@ class BaseExtractor(object):
             match_obj = re.match(r'(\d+)-(\d+)\s\d+:\d+$', str)
             if match_obj:
 		t_month = int(match_obj.group(1))
+		t_day = int(match_obj.group(2))
                 time_str = '{0}-{1}:00'.format(today.year-1 if (t_month>today.month) or (t_month == today.month and t_day >= today.day) else today.year, str)
             if re.match(r'\d+-\d+-\d+\s\d+:\d+:\d+$', str):
                 time_str = str
